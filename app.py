@@ -104,3 +104,35 @@ fig = px.bar(
 )
 
 st.plotly_chart(fig)
+
+mois_labels = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+
+# Créez un DataFrame pour les rendements mensuels par mois (tous les mois de toutes les années)
+rendements_mensuels_par_mois = []
+for mois in range(1, 13):
+    rendements_mensuels_mois = []
+    for annee in annees_uniques:
+        mois_df = crypto_df[(crypto_df['Annee'] == annee) & (crypto_df['Mois'] == mois)]
+        rendement_mensuel = mois_df['Rendement Quotidien'].sum()
+        rendements_mensuels_mois.append(rendement_mensuel)
+    rendements_mensuels_par_mois.append(rendements_mensuels_mois)
+
+# Créez un DataFrame pour les rendements mensuels par mois
+df_rendements_mensuels_mois = pd.DataFrame(rendements_mensuels_par_mois, columns=annees_uniques, index=mois_labels)
+
+# Transposez le DataFrame pour avoir les mois en colonnes
+df_rendements_mensuels_mois = df_rendements_mensuels_mois.T
+
+# Utilisation de Streamlit pour afficher le graphique Plotly
+st.title('Rendements Mensuels par Mois pour Chaque Année')
+mois = st.multiselect("Choisir le(s) mois : ",df_rendements_mensuels_mois.columns)
+fig = px.line(df_rendements_mensuels_mois,x = df_rendements_mensuels.index,y=mois, title='Rendements Mensuels par Mois pour Chaque Année')
+
+# Personnal'isez les libellés de l'axe X
+fig.update_xaxes(ticktext=df_rendements_mensuels.index,title_text='Année')
+
+# Définissez les noms des légendes de l'axe Y
+fig.update_yaxes(title_text='Rendement Mensuel (%)')
+
+st.plotly_chart(fig)
+
